@@ -5,7 +5,7 @@ export const metadata = { title: "Privacy Policy | Anovibe" };
 
 export default function Privacy() {
   return (
-    <LegalShell title="Privacy Policy" updated="October 8, 2026">
+    <LegalShell title="Privacy Policy" updated="October 20, 2026">
       <p>Anovibe is built so people can send honest messages without revealing who they are. This page explains what we collect and why.</p>
       <h2>If you have an account</h2>
       <ul>
@@ -16,11 +16,7 @@ export default function Privacy() {
       <h2>If you send a message</h2>
       <p>You don&apos;t need an account. We store your message text, its category, and a salted hash made from your network address and a cookie on your device. We don&apos;t store your raw IP address, and the recipient never sees the hash. We use it only to limit spam and to make blocking work.</p>
       <h2>Cookies</h2>
-      <ul>
-        <li>A session cookie keeps account holders logged in.</li>
-        <li>A device cookie (<code>av_d</code>) is set when you send a message, for rate limiting and blocking.</li>
-      </ul>
-      <p>We don&apos;t use advertising or tracking cookies.</p>
+      <p>When you log in, a cookie keeps you signed in. When you send a message, we save a small cookie on your device so we can slow down spammers and block senders who abuse the app. We don&apos;t use cookies for ads or tracking.</p>
       <h2>Who we share data with</h2>
       <p>We don&apos;t sell your data. We use service providers to run Anovibe: a hosting provider, a database provider, and Google if you choose Google sign-in. We may disclose information if the law requires it.</p>
       <h2>Your choices</h2>
