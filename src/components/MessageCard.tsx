@@ -1,16 +1,48 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Heart, Trash2, Flag, Ban, Reply } from "lucide-react";
+import { Heart, Trash2, Flag, Ban, Reply, ImageDown } from "lucide-react";
 import { ago } from "@/lib/ago";
+import { renderMessageImage } from "@/lib/messageImage";
+import { profileUrl } from "@/lib/share";
 
 type M = { id: string; body: string; category: string; liked: boolean; reply: string | null; createdAt: string };
 const icon = "rounded-full p-2 text-slate hover:bg-navy/5 hover:text-navy";
 
-export default function MessageCard({ m }: { m: M }) {
+export default function MessageCard({ m, username, theme }: { m: M; username: string; theme: string }) {
   const router = useRouter();
   const [replying, setReplying] = useState(false);
   const [text, setText] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [note, setNote] = useState("");
+
+  async function saveImage() {
+    setSaving(true);
+    setNote("");
+    try {
+      const blob = await renderMessageImage({ body: m.body, category: m.category, username, theme, link: profileUrl(username) });
+      const file = new File([blob], "anovibe-message.png", { type: "image/png" });
+      // On phones, open the share sheet so it can go straight to a story.
+      if (navigator.canShare?.({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file] });
+          return;
+        } catch (e) {
+          if ((e as Error).name === "AbortError") return;
+        }
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "anovibe-message.png";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch {
+      setNote("Couldn't make the image. Try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function call(method: string, body?: object) {
     await fetch(`/api/messages/${m.id}`, {
@@ -38,6 +70,9 @@ export default function MessageCard({ m }: { m: M }) {
             <Reply size={18} />
           </button>
         )}
+        <button aria-label="Save as image" title="Save as image" disabled={saving} className={`${icon} disabled:opacity-50`} onClick={saveImage}>
+          <ImageDown size={18} />
+        </button>
         <button
           aria-label="Report"
           className={icon}
@@ -59,6 +94,8 @@ export default function MessageCard({ m }: { m: M }) {
           <Trash2 size={18} />
         </button>
       </div>
+
+      {note && <p className="mt-1 text-sm font-medium text-coral">{note}</p>}
 
       {replying && (
         <div className="mt-2 space-y-2">

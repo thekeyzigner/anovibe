@@ -15,12 +15,12 @@ export default async function Inbox({ searchParams }: { searchParams: Promise<{ 
   const { c = "" } = await searchParams;
   const uid = (await auth())!.user.id;
   const category = ["QUESTION", "COMPLIMENT", "OTHER"].includes(c) ? (c as MessageCategory) : undefined;
+  const me = await prisma.user.findUniqueOrThrow({ where: { id: uid }, select: { username: true, theme: true } });
   const msgs = await prisma.message.findMany({
     where: { recipientId: uid, category },
     orderBy: { createdAt: "desc" },
     take: 100,
   });
-
   await prisma.message.updateMany({ where: { recipientId: uid, readAt: null }, data: { readAt: new Date() } });
 
   return (
@@ -40,7 +40,7 @@ export default async function Inbox({ searchParams }: { searchParams: Promise<{ 
       <div className="space-y-3">
         {msgs.length === 0 && <p className="text-slate">Nothing here yet. Share your link to get your first message.</p>}
         {msgs.map((m) => (
-          <MessageCard key={m.id} m={{ ...m, createdAt: m.createdAt.toISOString() }} />
+          <MessageCard key={m.id} m={{ ...m, createdAt: m.createdAt.toISOString() }} username={me.username} theme={me.theme} />
         ))}
       </div>
     </div>
